@@ -31,7 +31,7 @@ local floor = math.floor
 
 -- Modules --
 local bezier = require("spline_ops.bezier")
-local integrators = require("number_ops.integrators")
+local integrators = require("tektite_core.number.integrators")
 
 -- Exports --
 local M = {}
