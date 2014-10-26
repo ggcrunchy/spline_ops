@@ -218,8 +218,8 @@ end
 
 --- Populates an arc &rarr; parameter lookup table given a function to integrate over [0, 1].
 -- @array lut Lookup table, cf. @{Lookup}.
--- @string? how If this is **"gauss_legendre"**, @{number_ops.integrators.GaussLegendre} is used
--- as the integration method. Otherwise, @{number_ops.integrators.Romberg} is used.
+-- @string? how If this is **"gauss_legendre"**, @{tektite_core.number.integrators.GaussLegendre} is used
+-- as the integration method. Otherwise, @{tektite_core.number.integrators.Romberg} is used.
 -- @callable func Function to integrate, e.g. an integrand supplied by @{spline_ops.cubic.LineIntegrand}.
 -- @int[opt] nsamples Number of samples to load into _lut_. If absent, a default is used.
 -- @number[opt] tolerance Tolerance, as used by some integrators. If absent, a default is used.
