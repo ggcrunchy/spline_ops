@@ -1,7 +1,12 @@
---- Some utilities for calculating arc lengths.
+--- Some utilities for building arc-length lookup tables, built atop @{tektite_core.number.sampling}.
+--
+-- The samples' **x** values correspond to the arc length, _s_, and go from 0 to the full
+-- length of the curve. The **y** values correspond to a "curve time", _t_, that increases
+-- monotonically from 0 to 1.
 --
 -- For purposes of this module, an instance of type **Vector** is a value, e.g. a table,
--- that has and / or receives **number** members **x** and **y**.
+-- that has and / or receives **number** members **x** and **y**. (**N.B.** The samples from
+-- the previous paragraph are unrelated, despite the coincidence of field names.)
 
 --
 -- Permission is hereby granted, free of charge, to any person obtaining
@@ -26,126 +31,17 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
--- Standard library imports --
-local floor = math.floor
-
 -- Modules --
 local bezier = require("spline_ops.bezier")
 local integrators = require("tektite_core.number.integrators")
+local sampling = require("tektite_core.number.sampling")
 
 -- Exports --
 local M = {}
 
---- Converts an arc length into a curve parameter, given a lookup table.
--- @bool add_01_wrapper Return wrapper function?
--- @array[opt] lut The underlying lookup table. If absent, a table is supplied.
---
--- In a well-formed, populated table, each element  will have **number** members **s** and
--- **t**. In the first element, both values will be 0. In the final elemnt, **t** will be
--- 1. In element _lut[i + 1]_, **s** and **t** must each be larger than the respective
--- members in element _lut[i]_.
--- @treturn function Lookup function, called as
---    t1, t2, index, u, s1, s2 = func(s, start)
--- where _s_ is the arc length to search and _start_ is an (optional) index where the search
--- may be started (when performing multiple "nearby" lookups, this might speed up search).
---
--- _t1_ and _t2_ are the t parameter bounds of the interval, _s1_ and _s2_ are the arc length
--- bounds of the same, _index_ is the interval index (e.g. for passing again as _start_), and
--- _u_ is an interpolation factor &isin; [0, 1], which may be used to approximate _t_, given
--- _t1_ and _t2_.
---
--- The arc length is clamped to [0, _s_), _s_ being the final **s** in the lookup table.
--- @treturn array _lut_.
--- @treturn ?function If _add\_01\_wrapper_ is true, this is a function that behaves like the
--- lookup function, except the input range is scaled to [0, 1].
-function M.Lookup (add_01_wrapper, lut)
-	lut = lut or { n = 0 }
-
-	local function S_to_T (s, start)
-		local n, t = lut.n
-		local i = start or floor(.5 * n)
-
-		-- Negative arc / less-than-1 start index: clamp to start of arc.
-		if s <= 0 or i < 1 then
-			i, t = 1, 0
-
-		-- Arc length exceeded / n-or-more start index: clamp to end of arc.
-		elseif i >= n or s >= lut[n].s then
-			i, t = n - 1, 1
-
-		-- At this point, the arc is known to be within the interval, and thus a binary
-		-- search will succeed.
-		else
-			local lo, hi = 1, n
-
-			while true do
-				-- Narrow interval: just do a linear search.
-				if hi - lo <= 5 then
-					i = lo - 1
-
-					repeat
-						i = i + 1
-					until s < lut[i + 1].s
-
-					break
-
-				-- Arc length is in an earlier interval.
-				elseif s < lut[i].s then
-					hi = i - 1
-
-				-- Arc length is in a later interval.
-				elseif s >= lut[i + 1].s then
-					lo = i + 1
-
-				-- Arc length found.
-				else
-					break
-				end
-
-				-- Tighten the search and try again.
-				i = floor(.5 * (lo + hi))
-			end
-		end
-
-		-- Return the s- and t-bounds, the interval index, and an approximate blend factor.
-		local entry, next = lut[i], lut[i + 1]
-		local s1, s2 = entry.s, next.s
-
-		return entry.t, next.t, i, t or (s - s1) / (s2 - s1), s1, s2
-	end
-
-	-- If requested, supply a convenience function that takes s in [0, 1].
-	local S_to_T_01
-
-	if add_01_wrapper then
-		function S_to_T_01 (s, start)
-			local last = lut[lut.n]
-
-			if last then
-				s = s * last.s
-			end
-
-			return S_to_T(s, start)
-		end
-	end
-
-	return S_to_T, lut, S_to_T_01
-end
-
--- Adds a length / parameter pair to the LUT
-local function AddToLUT (lut, i, s, t)
-	local entry = lut[i] or {}
-
-	entry.s, entry.t = s, t
-
-	lut[i] = entry
-end
-
 -- Adds the final "full" arc length to the LUT and makes it ready to use
-local function CloseLUT (lut, s, n)
-	AddToLUT(lut, n, s, 1)
-
-	lut.n = n
+local function CloseLUT (lut, s)
+	sampling.AddSample(lut, s, 1)
 
 	return s
 end
@@ -158,10 +54,10 @@ local function SetLUT_Bezier (lut, nsamples, func, tolerance)
 	nsamples = nsamples or 20
 
 	local spline, deg = Bezier, #Bezier - 1
-	local s, t, index, dt = 0, 0, 1, 1 / nsamples
+	local s, t, dt = 0, 0, 1 / nsamples
 
 	repeat
-		AddToLUT(lut, index, s, t)
+		sampling.AddSample(lut, s, t)
 
 		-- Divide the curve into parts of length u = 1 / nsamples. On the first iteration,
 		-- the subdivision parameter is trivially u itself, leaving a right-hand side of
@@ -173,10 +69,10 @@ local function SetLUT_Bezier (lut, nsamples, func, tolerance)
 
 		local ds = func(Left, tolerance)
 
-		spline, s, t, index, nsamples = Right, s + ds, t + dt, index + 1, nsamples - 1
+		spline, s, t, nsamples = Right, s + ds, t + dt, nsamples - 1
 	until nsamples == 0
 
-	return CloseLUT(lut, s, index)
+	return CloseLUT(lut, s)
 end
 
 --- Populates an arc &rarr; parameter lookup table given a (degree 2) B&eacute;zier spline.
@@ -233,18 +129,18 @@ function M.SetLUT_Func (lut, how, func, nsamples, tolerance)
 		how = integrators.Romberg
 	end
 
-	local a, s, index, dt = 0, 0, 1, 1 / nsamples
+	local a, s, dt = 0, 0, 1 / nsamples
 
 	for _ = 1, nsamples do
-		AddToLUT(lut, index, s, a)
+		sampling.AddSample(lut, s, a)
 
 		local b = a + dt
 		local ds = how(func, a, b, tolerance)
 
-		a, s, index = b, s + ds, index + 1
+		a, s = b, s + ds
 	end
 
-	return CloseLUT(lut, s, index)
+	return CloseLUT(lut, s)
 end
 
 -- Export the module.
