@@ -18,6 +18,5 @@ is rather non-obvious.
 
 Tested on Lua 5.1.
 
-The `arc_length` module depends on some [integrators](https://github.com/ggcrunchy/corona-sdk-snippets/blob/master/number_ops/integrators.lua)
-support, which is in the rather unstable `number_ops` directory (logically it's four or five submodules, I think). It is very likely this will
-move, say to a "solvers" submodule, but I'm still thinking about it.
+The `arc_length` module depends on some [integrators](https://github.com/ggcrunchy/tektite_core/blob/master/number/integrators.lua)
+support, along with a couple other things in that same directory.
