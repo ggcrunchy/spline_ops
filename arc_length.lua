@@ -39,6 +39,10 @@ local sampling = require("tektite_core.number.sampling")
 -- Exports --
 local M = {}
 
+--
+--
+--
+
 -- Adds the final "full" arc length to the LUT and makes it ready to use
 local function CloseLUT (lut, s)
 	sampling.AddSample(lut, s, 1)
@@ -143,5 +147,4 @@ function M.SetLUT_Func (lut, how, func, nsamples, tolerance)
 	return CloseLUT(lut, s)
 end
 
--- Export the module.
 return M

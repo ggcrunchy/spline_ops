@@ -43,6 +43,10 @@ local _Length2_
 -- Exports --
 local M = {}
 
+--
+--
+--
+
 --- Gets the position along a quadratic B&eacute;zier spline at time _t_.
 -- @tparam Vector p1 Endpoint #1...
 -- @tparam Vector q ...control point...
@@ -362,9 +366,7 @@ do
 	end
 end
 
--- Cache module members.
 _Bezier2_ = M.Bezier2
 _Length2_ = M.Length2
 
--- Export the module.
 return M

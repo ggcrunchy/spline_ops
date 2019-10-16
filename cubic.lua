@@ -34,15 +34,19 @@
 local sqrt = math.sqrt
 local unpack = unpack
 
--- Exports --
-local M = {}
-
 -- Cached module references --
 local _EvaluateCoeffs_
 local _GetPolyCoeffs_
 local _GetPosition_
 local _GetTangent_
 local _MapCoeffsToSpline_
+
+-- Exports --
+local M = {}
+
+--
+--
+--
 
 -- "Left-hand side" eval functions --
 -- General idea: Given geometry matrix [P1 P2 P3 P4] and eval matrix (i.e. the constant
@@ -414,12 +418,10 @@ end
 
 -- TODO: TCB, uniform B splines?
 
--- Cache module members.
 _EvaluateCoeffs_ = M.EvaluateCoeffs
 _GetPolyCoeffs_ = M.GetPolyCoeffs
 _GetPosition_ = M.GetPosition
 _GetTangent_ = M.GetTangent
 _MapCoeffsToSpline_ = M.MapCoeffsToSpline
 
--- Export the module.
 return M
