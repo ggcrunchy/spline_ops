@@ -34,7 +34,6 @@
 -- Modules --
 local bezier = require("spline_ops.bezier")
 local integrators = require("tektite_core.number.integrators")
-local sampling = require("tektite_core.number.sampling")
 
 -- Exports --
 local M = {}
@@ -45,7 +44,7 @@ local M = {}
 
 -- Adds the final "full" arc length to the LUT and makes it ready to use
 local function CloseLUT (lut, s)
-	sampling.AddSample(lut, s, 1)
+	lut:Add(s, 1)
 
 	return s
 end
@@ -61,7 +60,7 @@ local function SetLUT_Bezier (lut, nsamples, func, tolerance)
 	local s, t, dt = 0, 0, 1 / nsamples
 
 	repeat
-		sampling.AddSample(lut, s, t)
+		lut:Add(s, t)
 
 		-- Divide the curve into parts of length u = 1 / nsamples. On the first iteration,
 		-- the subdivision parameter is trivially u itself, leaving a right-hand side of
@@ -136,7 +135,7 @@ function M.SetLUT_Func (lut, how, func, nsamples, tolerance)
 	local a, s, dt = 0, 0, 1 / nsamples
 
 	for _ = 1, nsamples do
-		sampling.AddSample(lut, s, a)
+		lut:Add(s, a)
 
 		local b = a + dt
 		local ds = how(func, a, b, tolerance)
