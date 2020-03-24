@@ -38,6 +38,8 @@ local sqrt = math.sqrt
 
 -- Cached module references --
 local _Bezier2_
+local _Bezier2_PosTan_
+local _Bezier2_Tan_
 local _Length2_
 
 -- Exports --
@@ -68,6 +70,60 @@ end
 -- @treturn number ...and y-coordinate.
 function M.Bezier2_Array (bezier, t)
 	return _Bezier2_(bezier[1], bezier[2], bezier[3], t)
+end
+
+--- Variant of @{Bezier2} that also returns the tangent.
+-- @tparam Vector p1 Endpoint #1...
+-- @tparam Vector q ...control point...
+-- @tparam Vector p2 ...and endpoint #2.
+-- @number t Interpolation time, &isin; [0, 1].
+-- @treturn number Position x-coordinate...
+-- @treturn number ...and y-coordinate.
+-- @treturn number Tangent x-component...
+-- @treturn number ...and y-component.
+function M.Bezier2_PosTan (p1, q, p2, t)
+	local s, t2 = 1 - t, 2 * t
+	local a, b, c = s^2, 2 * s * t, t^2
+	local px, py = a * p1.x + b * q.x + c * p2.x, a * p1.y + b * q.y + c * p2.y
+	local d, e, f = t2 - 2, 2 * (1 - t2), t2
+	local tx, ty = d * p1.x + e * q.x + f * p2.x, d * p1.y + e * q.y + f * p2.y
+
+	return px, py, tx, ty
+end
+
+--- Array variant of @{Bezier2_PosTan}.
+-- @array bezier Elements 1, 2, 3 are interpreted as arguments _p1_, _q_, _p2_ from @{Bezier2}.
+-- @number t Interpolation time, &isin; [0, 1].
+-- @treturn number Position x-coordinate...
+-- @treturn number ...and y-coordinate.
+-- @treturn number Tangent x-component...
+-- @treturn number ...and y-component.
+function M.Bezier2_PosTan_Array (bezier, t)
+	return _Bezier2_PosTan_(bezier[1], bezier[2], bezier[3], t)
+end
+
+--- Variant of @{Bezier2} that returns the tangent.
+-- @tparam Vector p1 Endpoint #1...
+-- @tparam Vector q ...control point...
+-- @tparam Vector p2 ...and endpoint #2.
+-- @number t Interpolation time, &isin; [0, 1].
+-- @treturn number Tangent x-component...
+-- @treturn number ...and y-component.
+function M.Bezier2_Tan (p1, q, p2, t)
+	local s, t2 = 1 - t, 2 * t
+	local a, b, c = t2 - 2, 2 * (1 - t2), t2
+	local tx, ty = a * p1.x + b * q.x + c * p2.x, a * p1.y + b * q.y + c * p2.y
+
+	return tx, ty
+end
+
+--- Array variant of @{Bezier2_Tan}.
+-- @array bezier Elements 1, 2, 3 are interpreted as arguments _p1_, _q_, _p2_ from @{Bezier2}.
+-- @number t Interpolation time, &isin; [0, 1].
+-- @treturn number Tangent x-component...
+-- @treturn number ...and y-component.
+function M.Bezier2_Tan_Array (bezier, t)
+	return _Bezier2_PosTan_(bezier[1], bezier[2], bezier[3], t)
 end
 
 -- Gets control point (as perpendicular displacement from midpoint)
@@ -367,6 +423,8 @@ do
 end
 
 _Bezier2_ = M.Bezier2
+_Bezier2_PosTan_ = M.Bezier2_PosTan
+_Bezier2_Tan_ = M.Bezier2_Tan
 _Length2_ = M.Length2
 
 return M
