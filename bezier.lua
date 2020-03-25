@@ -112,9 +112,8 @@ end
 function M.Bezier2_Tan (p1, q, p2, t)
 	local s, t2 = 1 - t, 2 * t
 	local a, b, c = t2 - 2, 2 * (1 - t2), t2
-	local tx, ty = a * p1.x + b * q.x + c * p2.x, a * p1.y + b * q.y + c * p2.y
 
-	return tx, ty
+	return a * p1.x + b * q.x + c * p2.x, a * p1.y + b * q.y + c * p2.y
 end
 
 --- Array variant of @{Bezier2_Tan}.
