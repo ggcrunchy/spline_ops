@@ -78,7 +78,7 @@ local function SetLUT_Bezier (lut, nsamples, func, tolerance)
 	return CloseLUT(lut, s)
 end
 
---- Populates an arc &rarr; parameter lookup table given a (degree 2) B&eacute;zier spline.
+--- Populate an arc &rarr; parameter lookup table given a (degree 2) B&eacute;zier spline.
 -- @array lut Lookup table, cf. @{tektite_core.number.sampling.Lookup}.
 -- @tparam Vector p1 Endpoint #1...
 -- @tparam Vector q ...control point...
@@ -95,7 +95,11 @@ function M.SetLUT_Bezier2 (lut, p1, q, p2, nsamples)
 	return s
 end
 
---- Populates an arc &rarr; parameter lookup table given a (degree 3) B&eacute;zier spline.
+--
+--
+--
+
+--- Populate an arc &rarr; parameter lookup table given a (degree 3) B&eacute;zier spline.
 -- @array lut Lookup table, cf. @{tektite_core.number.sampling.Lookup}.
 -- @tparam Vector p1 Endpoint #1...
 -- @tparam Vector q1 ...control point #1...
@@ -115,7 +119,11 @@ function M.SetLUT_Bezier3 (lut, p1, q1, q2, p2, nsamples, tolerance)
 	return s
 end
 
---- Populates an arc &rarr; parameter lookup table given a function to integrate over [0, 1].
+--
+--
+--
+
+--- Populate an arc &rarr; parameter lookup table given a function to integrate over [0, 1].
 -- @array lut Lookup table, cf. @{tektite_core.number.sampling.Lookup}.
 -- @string? how If this is **"gauss_legendre"**, @{tektite_core.number.integrators.GaussLegendre} is used
 -- as the integration method. Otherwise, @{tektite_core.number.integrators.Romberg} is used.
@@ -145,5 +153,9 @@ function M.SetLUT_Func (lut, how, func, nsamples, tolerance)
 
 	return CloseLUT(lut, s)
 end
+
+--
+--
+--
 
 return M

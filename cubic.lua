@@ -79,7 +79,7 @@ function RHS.bezier (coeffs, a, b, c, d)
 	coeffs.d = d
 end
 
---- Converts coefficients from B&eacute;zier (P1, Q1, Q2, P2) to Hermite (P1, P2, T1, T2) form.
+--- Convert coefficients from B&eacute;zier (P1, Q1, Q2, P2) to Hermite (P1, P2, T1, T2) form.
 --
 -- This (and the similar functions in this module) are written so that output coefficients
 -- may safely overwrite the inputs, i.e. if _src*_ = _dst*_.
@@ -103,7 +103,11 @@ function M.BezierToHermite (src1, src2, src3, src4, dst1, dst2, dst3, dst4)
 	dst4.x, dst4.y = t2x, t2y
 end
 
---- Converts coefficients from Catmull-Rom (P1, P2, P3, P4) to Hermite (P2, P3, T1, T2) form.
+--
+--
+--
+
+--- Convert coefficients from Catmull-Rom (P1, P2, P3, P4) to Hermite (P2, P3, T1, T2) form.
 -- @tparam Vector src1 Vector #1 (i.e. P1)...
 -- @tparam Vector src2 ...#2 (P2)...
 -- @tparam Vector src3 ...#3 (P3)...
@@ -124,6 +128,10 @@ function M.CatmullRomToHermite (src1, src2, src3, src4, dst1, dst2, dst3, dst4)
 	dst4.x, dst4.y = t2x, t2y
 end
 
+--
+--
+--
+
 -- Left-hand side Catmull-Rom evaluator
 function LHS.catmull_rom (a, b, c, d)
 	local B = .5 * (-a + c)
@@ -141,7 +149,7 @@ function RHS.catmull_rom (coeffs, a, b, c, d)
 	coeffs.d = .5 * (-c + d)
 end
 
---- Evaluates coefficents for use with @{MapCoeffsToSpline}.
+--- Evaluate coefficents for use with @{MapCoeffsToSpline}.
 -- @string stype Spline type.
 -- @tparam ?|Coeffs|nil pos If present, position coefficients to evaluate at _t_.
 -- @tparam ?|Coeffs|nil tan If present, tangent coefficients to evaluate at _t_.
@@ -158,7 +166,11 @@ function M.EvaluateCoeffs (stype, pos, tan, t)
 	end
 end
 
---- Gets polynomial coefficients for calculating line integrands.
+--
+--
+--
+
+--- Get polynomial coefficients for calculating line integrands.
 -- 
 -- A given cubic spline can be written as a polynomial _A_x&sup3; + _B_x&sup2; + _C_x + _D_, for
 -- both its x- and y-components. Furthermore, its derivative is useful for computing the
@@ -186,6 +198,10 @@ function M.GetPolyCoeffs (stype, a, b, c, d)
 	return ax, ay, bx, by, cx, cy
 end
 
+--
+--
+--
+
 --- Array variant of @{GetPolyCoeffs}.
 -- @string stype Spline type.
 -- @array spline Elements 1, 2, 3, 4 are interpreted as arguments _a_, _b_, _c_, _d_
@@ -195,10 +211,13 @@ function M.GetPolyCoeffs_Array (stype, spline)
 	return _GetPolyCoeffs_(stype, unpack(spline))
 end
 
--- Intermediate coefficients --
+--
+--
+--
+
 local Coeffs = {}
 
---- Gets the position along the spline at time _t_.
+--- Get the position along the spline at time _t_.
 --
 -- This is a convenience wrapper around the common case that the user does not need to
 -- consider @{EvaluateCoeffs} and @{MapCoeffsToSpline} separately.
@@ -216,6 +235,10 @@ function M.GetPosition (stype, a, b, c, d, t)
 	return _MapCoeffsToSpline_(Coeffs, a, b, c, d)
 end
 
+--
+--
+--
+
 --- Array variant of @{GetPosition}.
 -- @string stype Spline type.
 -- @array pos Elements 1, 2, 3, 4 are interpreted as arguments _a_, _b_, _c_, _d_
@@ -229,7 +252,11 @@ function M.GetPosition_Array (stype, pos, t)
 	return _GetPosition_(stype, a, b, c, d, t)
 end
 
---- Gets the tangent to the spline at time _t_.
+--
+--
+--
+
+--- Get the tangent to the spline at time _t_.
 --
 -- This is a convenience wrapper around the common case that the user does not need to
 -- consider @{EvaluateCoeffs} and @{MapCoeffsToSpline} separately.
@@ -247,6 +274,10 @@ function M.GetTangent (stype, a, b, c, d, t)
 	return _MapCoeffsToSpline_(Coeffs, a, b, c, d)
 end
 
+--
+--
+--
+
 --- Array variant of @{GetTangent}.
 -- @string stype Spline type.
 -- @array tan Elements 1, 2, 3, 4 are interpreted as arguments _a_, _b_, _c_, _d_
@@ -259,6 +290,10 @@ function M.GetTangent_Array (stype, tan, t)
 
 	return _GetTangent_(stype, a, b, c, d, t)
 end
+
+--
+--
+--
 
 -- Left-hand side Hermite evaluator
 function LHS.hermite (a, b, c, d)
@@ -277,10 +312,9 @@ function RHS.hermite (coeffs, a, b, c, d)
 	coeffs.d = -c + d
 end
 
--- Tangent scale factor --
 local Div = 1 / 3
 
---- Converts coefficients from Hermite (P1, P2, T1, T2) to B&eacute;zier (P1, Q1, Q2, P2) form.
+--- Convert coefficients from Hermite (P1, P2, T1, T2) to B&eacute;zier (P1, Q1, Q2, P2) form.
 -- @tparam Vector src1 Vector #1 (i.e. P1)...
 -- @tparam Vector src2 ...#2 (P2)...
 -- @tparam Vector src3 ...#3 (T1)...
@@ -301,7 +335,11 @@ function M.HermiteToBezier (src1, src2, src3, src4, dst1, dst2, dst3, dst4)
 	dst3.x, dst3.y = q2x, q2y
 end
 
---- Converts coefficients from Hermite (P1, P2, T1, T2) to Catmull-Rom (P0, P1, P2, P3) form.
+--
+--
+--
+
+--- Convert coefficients from Hermite (P1, P2, T1, T2) to Catmull-Rom (P0, P1, P2, P3) form.
 -- @tparam Vector src1 Vector #1 (i.e. P1)...
 -- @tparam Vector src2 ...#2 (P2)...
 -- @tparam Vector src3 ...#3 (T1)...
@@ -322,6 +360,10 @@ function M.HermiteToCatmullRom (src1, src2, src3, src4, dst1, dst2, dst3, dst4)
 	dst4.x, dst4.y = p4x, p4y
 end
 
+--
+--
+--
+
 --- [Line integrand](http://en.wikipedia.org/wiki/Arc_length#Finding_arc_lengths_by_integrating) for a cubic polynomial.
 -- @array[opt] poly The underlying polynomial, (dx/dt)&sup2; + (dy/dt)&sup2;: elements 1 to
 -- 5 are the x&#8308;, x&sup3;, x&sup2;, x, and constant coefficients, respectively. If
@@ -338,7 +380,11 @@ function M.LineIntegrand (poly)
 	end, poly
 end
 
---- Given some spline geometry, maps pre-computed coefficients to a spline.
+--
+--
+--
+
+--- Given some spline geometry, map pre-computed coefficients to a spline.
 -- @tparam Coeffs coeffs Coefficients generated e.g. by @{EvaluateCoeffs}.
 -- @tparam Vector a Vector #1 defining the spline...
 -- @tparam Vector b ...#2...
@@ -353,7 +399,11 @@ function M.MapCoeffsToSpline (coeffs, a, b, c, d)
 	return x, y
 end
 
---- Assigns integrand coefficents (in particular, as expected by @{LineIntegrand}'s integrand
+--
+--
+--
+
+--- Assign integrand coefficents (in particular, as expected by @{LineIntegrand}'s integrand
 -- function), given a cubic polynomial's derivatives: dx/dt = 3_Ax&sup2;_ + 2_Bx_ +
 -- _C_, dy/dt = 3_Dy&sup2;_ + 2_Ey_ + F.
 -- @array poly Polynomial.
@@ -373,10 +423,13 @@ function M.SetPolyFromCoeffs (poly, ax, ay, bx, by, cx, cy)
 	poly[5] = cx^2 + cy^2
 end
 
--- Intermediate coefficients --
+--
+--
+--
+
 local Pos, Tan = {}, {}
 
---- Truncates a B&eacute;zier spline, i.e. the part of the spline &isin; [_t1_, _t2_] becomes
+--- Truncate a B&eacute;zier spline, i.e. the part of the spline &isin; [_t1_, _t2_] becomes
 -- a new B&eacute;zier spline, reparameterized to the interval [0, 1].
 -- @tparam Vector src1 Vector #1 (i.e. P1)...
 -- @tparam Vector src2 ...#2 (Q1)...
@@ -415,6 +468,10 @@ function M.Truncate (src1, src2, src3, src4, t1, t2, dst1, dst2, dst3, dst4)
 	dst3.x, dst3.y = p2x - t2x * dt, p2y - t2y * dt
 	dst4.x, dst4.y = p2x, p2y
 end
+
+--
+--
+--
 
 -- TODO: TCB, uniform B splines?
 
