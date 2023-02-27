@@ -215,6 +215,6 @@ end
 --
 --
 
-_Length_Array_ = M.LengthArray
+_Length_Array_ = M.Length_Array
 
 return M
