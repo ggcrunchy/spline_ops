@@ -62,7 +62,7 @@ local M = {}
 -- @treturn number ...and y-coordinate.
 function M.GetPosition (p1, q, p2, t)
 	local s = 1 - t
-	local a, b, c = s^2, 2 * s * t, t^2
+	local a, b, c = s * s, 2 * s * t, t * t
 
 	return a * p1.x + b * q.x + c * p2.x, a * p1.y + b * q.y + c * p2.y
 end
@@ -95,7 +95,7 @@ end
 -- @treturn number ...and y-component.
 function M.GetPositionAndTangent (p1, q, p2, t)
 	local s, t2 = 1 - t, 2 * t
-	local a, b, c = s^2, 2 * s * t, t^2
+	local a, b, c = s * s, 2 * s * t, t * t
 	local px, py = a * p1.x + b * q.x + c * p2.x, a * p1.y + b * q.y + c * p2.y
 	local d, e, f = t2 - 2, 2 * (1 - t2), t2
 	local tx, ty = d * p1.x + e * q.x + f * p2.x, d * p1.y + e * q.y + f * p2.y
@@ -249,8 +249,8 @@ function M.Length (p1, q, p2)
 	local ax, bx = p2.x - qpx, qpx - p1x
 	local ay, by = p2.y - qpy, qpy - p1y
 
-	local A = ax^2 + ay^2
-	local C = bx^2 + by^2
+	local A = ax * ax + ay * ay
+	local C = bx * bx + by * by
 
 	if A > 1e-9 then
 		A = 4 * A
@@ -260,7 +260,7 @@ function M.Length (p1, q, p2)
 		local A_2, C_2 = sqrt(A), 2 * sqrt(C)
 		local A_32, BA = 2 * A * A_2, B / A_2
 
-		return (A_32 * Sabc + A_2 * B * (Sabc - C_2) + (4 * C * A - B^2) * log((2 * A_2 + BA + Sabc) / (BA + C_2))) / (4 * A_32)
+		return (A_32 * Sabc + A_2 * B * (Sabc - C_2) + (4 * C * A - B * B) * log((2 * A_2 + BA + Sabc) / (BA + C_2))) / (4 * A_32)
 	else
 		return sqrt(C)
 	end

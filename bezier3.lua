@@ -32,11 +32,13 @@
 
 -- Standard library imports --
 local ipairs = ipairs
-local sqrt = math.sqrt
 
 -- Modules --
 local arc_length = require("tektite_core.number.arc_length")
 local utils = require("spline_ops.utils")
+
+-- Extension imports --
+local hypot = math.hypot
 
 -- Cached module references --
 local _Length_Array_
@@ -120,13 +122,13 @@ local function AddIfClose (length, err)
 
 	local base = Top + 1
 	local x, y = V[base], V[base + 1]
-	local dx, dy = V[base + 6] - x, V[base + 7] - y
 
-	local len, main_len = 0, sqrt(dx^2 + dy^2)
+	local len, main_len = 0, hypot(V[base + 6] - x, V[base + 7] - y)
 
 	for _ = 1, 3 do
-		dx, dy = V[base + 2] - x, V[base + 3] - y
-		len = len + sqrt(dx^2 + dy^2)
+		local dx, dy = V[base + 2] - x, V[base + 3] - y
+
+		len = len + hypot(dx, dy)
 		base, x, y = base + 2, x + dx, y + dy
 	end
 
